@@ -1,0 +1,26 @@
+{
+  "name": "slack-reaction-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sudharsan-selvaraj/slack-reaction-bot.git"
+  },
+  "author": "Sudharsan Selvaraj <sudharsanselvaraj.c@gmail.com> (https://github.com/sudharsan-selvaraj/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sudharsan-selvaraj/slack-reaction-bot/issues"
+  },
+  "homepage": "https://github.com/sudharsan-selvaraj/slack-reaction-bot#readme",
+  "dependencies": {
+    "ejs": "^2.5.9",
+    "express": "^4.16.3",
+    "express-handlebars": "^3.0.0",
+    "http-proxy": "^1.17.0"
+  }
+}
