@@ -1,73 +1,80 @@
-const express = require('express')
-const app = express();
-const path = require('path');
-const exphbs = require('express-handlebars');
-const httpProxy = require('http-proxy');
-var apiProxy = httpProxy.createProxyServer();
-var BACKEND_IP = process.env.npm_package_config_backend || "127.0.0.1";
-const PORT = process.env.PORT || 5000
+#!/usr/bin/env node
+"use strict";
 
-app.engine('.html', exphbs({extname: '.html'}));
-app.use(express.static(path.join(__dirname, 'public')))
-    .set('views', path.join(__dirname, 'views'))
-    .set('view engine', ".html");
+//module dependencies
+var server = require("./built/modules/server.js");
+var debug = require("debug")("express:server");
+var http = require("http");
 
-// app.all("*", function (req, res) {
-//     console.log(`http://${BACKEND_IP}:3000`);
-//     apiProxy.web(req, res, {target: `http://${BACKEND_IP}:3000`});
-// });
+//create http server
+var httpPort = normalizePort(process.env.PORT || 8080);
+var app = server.Server.bootstrap().app;
+app.set("port", httpPort);
+var httpServer = http.createServer(app);
 
-app.post("/getimage", (req, res)=> {
+//listen on provided ports
+httpServer.listen(httpPort);
 
-    var response = {
-        "text": "New comic book alert!",
-        "attachments": [
-            {
-                "title": "The Further Adventures of Slackbot",
-                "image_url": "http://2.bp.blogspot.com/-I5q_amc2t-s/U-edLQWIRWI/AAAAAAAAEio/79sbZFCUIzo/s1600-d/v4.jpg"
-            },
-            {
-                "fallback": "Would you recommend it to customers?",
-                "title": "Would you recommend it to customers?",
-                "callback_id": "comic_1234_xyz",
-                "color": "#3AA3E3",
-                "attachment_type": "default",
-                "actions": [
-                    {
-                        "name": "send",
-                        "text": "send",
-                        "type": "button",
-                        "value": "send"
-                    },
-                    {
-                        "name": "shuffle",
-                        "text": "shuffle",
-                        "type": "button",
-                        "value": "shuffle"
-                    }
-                ]
-            }
-        ]
+//add error handler
+httpServer.on("error", onError);
+
+//start listening on port
+httpServer.on("listening", onListening);
+
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
     }
 
-    res.send(response);
+    if (port >= 0) {
+        // port number
+        return port;
+    }
 
-});
+    return false;
+}
 
-app.post("/shuffle", (req, res)=> {
+/**
+ * Event listener for HTTP server "error" event.
+ */
+function onError(error) {
+    if (error.syscall !== "listen") {
+        throw error;
+    }
 
-});
+    var bind = typeof port === "string"
+        ? "Pipe " + port
+        : "Port " + port;
 
-app.post("/send", (req, res)=> {
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case "EACCES":
+            console.error(bind + " requires elevated privileges");
+            process.exit(1);
+            break;
+        case "EADDRINUSE":
+            console.error(bind + " is already in use");
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
 
-});
-
-app.post("/save", (req, res)=> {
-
-});
-
-app.get("/", (req, res)=> {
-    res.render('index.html')
-});
-
-app.listen(PORT, () => console.log('Example app listening on port 3000!'))
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+function onListening() {
+    var addr = httpServer.address();
+    var bind = typeof addr === "string"
+        ? "pipe " + addr
+        : "port " + addr.port;
+    debug("Listening on " + bind);
+}
